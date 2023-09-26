@@ -1,0 +1,69 @@
+# #################################
+# Parameters to run the 
+#   baseline attacks for the paper.
+#
+# Authors:
+#  * Heitor Guimarães 2022
+#  * Orson Mengara 2022
+#  * Yi Zhu 2022
+# #################################
+
+seed: 1234
+__set_seed: !apply:torch.manual_seed [!ref <seed>]
+
+# Shared variables
+encoder: "facebook/wav2vec2-base-960h"
+
+# Set up folders for reading from and writing to
+exp_name: kws_baseline_wav2vec2
+output_folder: !ref ./logs/<exp_name>
+model_folder: !ref <output_folder>/save
+log_path: !ref <output_folder>/log.txt
+
+# logs
+train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
+  save_file: !ref <log_path>
+
+# Data manifest
+annotation_folder: !PLACEHOLDER
+data_folder: !PLACEHOLDER
+
+# Training Parameters
+number_of_epochs: 10
+batch_size: 64
+
+dataloader_options:
+  shuffle: True
+  batch_size: !ref <batch_size>
+
+# Model & Attacker construction
+model: !new:a3d.models.CustomKWSModel
+  encoder: !ref <encoder>
+  n_classes: 12
+loss: !name:speechbrain.nnet.losses.nll_loss
+
+modules:
+  model: !ref <model>
+
+error_stats: !name:speechbrain.utils.metric_stats.MetricStats
+  metric: !name:speechbrain.nnet.losses.classification_error
+    reduction: batch
+
+# Optimizer and Scheduler parameters
+lr: 0.001
+opt_class: !name:torch.optim.Adam
+  lr: !ref <lr>
+
+lr_scheduler: !new:speechbrain.nnet.schedulers.LinearScheduler
+  initial_value: !ref <lr>
+  final_value: 0.0005
+  epoch_count: !ref <number_of_epochs>
+
+# Save state of the training process
+checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
+  checkpoints_dir: !ref <model_folder>
+  recoverables:
+    model: !ref <model>
+
+epoch_counter: !new:speechbrain.utils.epoch_loop.EpochCounter
+  limit: !ref <number_of_epochs>

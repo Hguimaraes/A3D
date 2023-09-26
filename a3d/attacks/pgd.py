@@ -1,7 +1,7 @@
 import logging
 import torch
 import torch.nn as nn
-from a3d.sigproc.noise import get_energy_ratio
+from a3d.attacks import get_energy_ratio
 
 class PGD(nn.Module):
     """This class implements the Projected Gradient Descent Attack 

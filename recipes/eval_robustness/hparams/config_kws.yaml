@@ -1,0 +1,99 @@
+# #################################
+# Parameters to run the 
+#   baseline attacks for the paper.
+#
+# Authors:
+#  * Heitor Guimarães 2022
+#  * Orson Mengara 2022
+#  * Yi Zhu 2022
+# #################################
+
+seed: 1234
+__set_seed: !apply:torch.manual_seed [!ref <seed>]
+
+# Set up folders for reading from and writing to
+exp_name: kws_pgd_wavlm
+attacker_model_folder: /home/heitor/projects/A3D/recipes/train_kws_models/logs/kws_baseline_wavlm/save
+victim_model_folder: /home/heitor/projects/A3D/recipes/train_kws_models/logs/kws_baseline_wavlm/save
+attacker_encoder: "microsoft/wavlm-base-plus"
+victim_encoder: "microsoft/wavlm-base-plus"
+
+output_folder: !ref ./logs/<exp_name>
+model_folder: !ref <output_folder>/save
+log_path: !ref <output_folder>/log.txt
+
+# logs
+train_logger: !new:speechbrain.utils.train_logger.FileTrainLogger
+  save_file: !ref <log_path>
+
+# Data manifest
+data_folder: !PLACEHOLDER
+annotation_folder: !PLACEHOLDER
+
+# Loader parameters
+batch_size: 64
+dataloader_options:
+  shuffle: True
+  batch_size: !ref <batch_size>
+
+# Victim & Attacker construction + Losses
+attacker: !new:a3d.models.CustomKWSModel
+  encoder: !ref <attacker_encoder>
+  n_classes: 12
+
+victim: !new:a3d.models.CustomKWSModel
+  encoder: !ref <victim_encoder>
+  n_classes: 12
+
+loss: !name:speechbrain.nnet.losses.nll_loss
+error_stats: !name:speechbrain.utils.metric_stats.MetricStats
+  metric: !name:speechbrain.nnet.losses.classification_error
+    reduction: batch
+
+# attack: !new:a3d.attacks.fgsm.FGSM
+#   model: !ref <attacker>
+#   loss_fn: !ref <loss>
+#   eps_snr: 10
+#   clip_min: -1.0
+#   clip_max: 1.0
+#   targeted: False
+
+attack: !new:a3d.attacks.pgd.PGD
+  model: !ref <attacker>
+  loss_fn: !ref <loss>
+  alpha_snr: 35
+  eps_snr: 30
+  clip_min: -1.0
+  clip_max: 1.0
+  targeted: False
+  steps: 25
+  random_start: True
+  order: 'Linf'
+
+# tau: 30
+# steps: 100
+
+# attack: !new:a3d.attacks.cw.CW
+#   model: !ref <attacker>
+#   loss_fn: !ref <loss>
+#   c: 5
+#   tau: !ref <tau>
+#   lr: 0.01
+#   clip_min: -1.0
+#   clip_max: 1.0
+#   targeted: False
+#   steps: !ref <steps>
+
+modules:
+  attack: !ref <attack>
+  model: !ref <victim>
+
+attacker_checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
+  checkpoints_dir: !ref <attacker_model_folder>
+  recoverables:
+    model: !ref <attacker>
+
+victim_checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
+  checkpoints_dir: !ref <victim_model_folder>
+  recoverables:
+    model: !ref <victim>

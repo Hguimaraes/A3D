@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from a3d.sigproc import get_energy_ratio
+from a3d.attacks import get_energy_ratio
 
 class FGSM(nn.Module):
     """This class implements the Fast-Gradient Sign Method

@@ -11,7 +11,7 @@ from speechbrain.dataio.dataloader import LoopedLoader
 # Logger info
 logger = logging.getLogger(__name__)
 
-class SupervisedBrain(sb.Brain):
+class KWSBrain(sb.Brain):
     agg_metric = "average"
 
     def compute_forward(self, batch, stage):
@@ -24,10 +24,9 @@ class SupervisedBrain(sb.Brain):
         # Get clean targets
         uttid = batch.id
         targets, lens = batch.target # B, 1
-        targets = targets.squeeze(0)
+        targets = targets.squeeze()
 
         # Compare the waveforms
-        # print(f"predictions: {predictions.shape}, targets: {targets.shape}")
         loss = self.hparams.loss(predictions, targets)
         if (stage != sb.Stage.TRAIN):
             self.error_metric.append(
@@ -134,7 +133,7 @@ class SupervisedBrain(sb.Brain):
             # Create the adversarial samples
             wavs, lens = batch.sig
             targets, lens = batch.target
-            targets = targets.squeeze(0)
+            targets = targets.squeeze()
             adversarial_samples, _ = self.modules.attack(wavs, targets)
 
             # Batch everything together

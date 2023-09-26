@@ -68,7 +68,10 @@ def prep_speechcommands(
         return
 
     # If the data folders do not exist, we need to extract the data
-    if not os.path.isdir(os.path.join(data_folder, "speech_commands_v0.02")):
+    data_folder = os.path.join(data_folder, "speech_commands_v0.02")
+    if not os.path.isdir(data_folder):
+        os.makedirs(data_folder, exist_ok=True)
+
         # Check for zip file and download if it doesn't exist
         tar_location = os.path.join(data_folder, "speech_commands_v0.02.tar.gz")
         if not os.path.exists(tar_location):
@@ -76,7 +79,6 @@ def prep_speechcommands(
         else:
             logger.info("Extracting speech_commands_v0.02.tar.gz...")
             shutil.unpack_archive(tar_location, data_folder)
-    data_folder = os.path.join(data_folder, "speech_commands_v0.02")
 
     # Define the words that we do not want to identify
     unknown_words = list(np.setdiff1d(all_words, words_wanted))
