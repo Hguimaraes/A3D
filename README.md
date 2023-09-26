@@ -70,15 +70,15 @@ $ python eval_ks.py hparams/config_kws.yaml --data_folder /folder_to_extract_gsc
 
 ## Results
 
-In the paper we have a section describing in more details the results from our study. However, we just want to illustrate here some notes:
+In the paper, we have a section describing the results of our study in more detail. However, we just want to illustrate here some notes:
 
-From the log-frequency power spectrogram, we can observe some specific patterns related to each attack. For the last 3 spectrograms, we isolated the noise and normalize to better visualize. 
+We can observe some specific patterns related to each attack from the log-frequency power spectrogram. We isolated the noise for the last 3 spectrograms and normalized it to better visualize. 
 
 ![image info](./assets/spec_multiple_attacks_vEdit.png)
 
 > As can be seen, the three attacks generated more noise in regions without speech activity and the noise patterns differed for each attack method. For example, FGSM generated high-frequency artifacts around 7 kHz; these appear as horizontal lines in the spectrogram. We attribute this pattern to the nature of the attack, which uses the sign of the model gradient, a high-frequency signal due to the sign-function changes. Down-sampling techniques have been studied in the audio domain as a potential defense mechanism against adversarial attacks~\cite{hussain2021waveguard}, with promising results in mitigating the attack patterns discussed. The PGD attack also exhibits this pattern. However, since the method is iterative, the patterns appear as more smooth in the spectrogram. Finally, the C&W attack is considerably distinct from the others. The noise pattern is similar to a white noise distribution without a clear pattern, thus more challenging to differentiate from an environmental perturbation and, potentially, more difficult to detect.
 
-We also investigate the usage of a frequency-frequency representation called [modulation spectrum]() as shown in the next figure. The modulation spectrum is an established technique that successfully captures the temporal dynamics of speech spectral components and has shown to separate signal from noise components more reliably.
+We also investigate using a frequency-frequency representation called [modulation spectrum](https://ieeexplore.ieee.org/document/5422672), as shown in the following figure. The modulation spectrum is an established technique that successfully captures the temporal dynamics of speech spectral components and has been shown to separate signal from noise components more reliably.
 
 ![image info](./assets/mod_spectrum_attacks_vEdit.png)
 
