@@ -6,9 +6,14 @@ Link to the full paper: [Click here](). [We will add as soon as the proceedings 
 
 ## Cite
 
-[We will add as soon as the proceedings are available.]
-
 ```latex
+@inproceedings{guimaraes2023s3rladvattacks,
+  author = {Guimarães, Heitor R. and Zhu, Yi and Mengara, Orson and Avila, Anderson R. and Falk, Tiago H.},
+  title = {Assessing the Vulnerability of Self-Supervised Speech Representations for Keyword Spotting Under White-Box Adversarial Attacks},
+  year = {2023},
+  booktitle = {2023 IEEE International Conference on Systems, Man, and Cybernetics (SMC)},
+  organization = {IEEE},
+}
 ```
 
 ## Abstract
